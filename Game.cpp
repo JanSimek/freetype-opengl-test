@@ -8,8 +8,6 @@
 #include "GLSLShader.h"
 #include "Utility.h"
 
-#include <SOIL.h>
-
 //shader reference
 GLSLShader shader;
 
@@ -24,9 +22,6 @@ GLuint textureID;
 //quad vertices and indices
 glm::vec4 vertices[4];
 GLushort indices[6];
-
-//texture image filename
-const std::string filename = "assets/petra.bmp";
 
 //projection and modelview matrices
 glm::mat4  P = glm::mat4( 1 );
@@ -112,50 +107,6 @@ void Game::init( unsigned short width, unsigned short height, bool fullscreen )
 	initGL();
 }
 
-
-#define WIDTH   640
-#define HEIGHT  480
-
-/* origin is the upper left corner */
-unsigned char image[HEIGHT][WIDTH];
-
-void draw_bitmap( FT_Bitmap*  bitmap,
-             FT_Int      x,
-             FT_Int      y )
-{
-    FT_Int  i, j, p, q;
-    FT_Int  x_max = x + bitmap->width;
-    FT_Int  y_max = y + bitmap->rows;
-
-
-    for( i = x, p = 0; i < x_max; i++, p++ )
-    {
-        for( j = y, q = 0; j < y_max; j++, q++ )
-        {
-            if( i < 0      || j < 0       ||
-                    i >= WIDTH || j >= HEIGHT )
-                continue;
-
-            image[j][i] |= bitmap->buffer[q * bitmap->width + p];
-        }
-    }
-}
-
-void show_image( void )
-{
-    int  i, j;
-
-
-    for( i = 0; i < HEIGHT; i++ )
-    {
-        for( j = 0; j < WIDTH; j++ )
-            putchar( image[i][j] == 0 ? ' '
-                     : image[i][j] < 128 ? '+'
-                     : '*' );
-        putchar( '\n' );
-    }
-}
-
 void Game::initGL()
 {
 	/* This makes our buffer swap syncronized with the monitor's vertical refresh */
@@ -219,36 +170,12 @@ void Game::initGL()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboIndicesID);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), &indices[0], GL_STATIC_DRAW);
     GL_CHECK_ERROR();
-/*
-    //load the image using SOIL
-	int texture_width = 0, texture_height = 0, channels = 0;
-	GLubyte* pData = SOIL_load_image( filename.c_str(), &texture_width, &texture_height, &channels, SOIL_LOAD_AUTO );
-	if( pData == NULL )
-	{
-		std::cerr << "Cannot load image: " << filename.c_str() << std::endl;
-		exit( EXIT_FAILURE );
-	}
-	//vertically flip the image on Y axis since it is inverted
-	int i, j;
-	for( j = 0; j * 2 < texture_height; ++j )
-	{
-		int index1 = j * texture_width * channels;
-		int index2 = ( texture_height - 1 - j ) * texture_width * channels;
-		for( i = texture_width * channels; i > 0; --i )
-		{
-			GLubyte temp = pData[index1];
-			pData[index1] = pData[index2];
-			pData[index2] = temp;
-			++index1;
-			++index2;
-		}
-	}
-    GL_CHECK_ERROR();
-*/
+
 	//setup OpenGL texture and bind to texture unit 0
     glGenTextures( 1, &textureID );
     glActiveTexture( GL_TEXTURE0 );
 	glBindTexture( GL_TEXTURE_2D, textureID );
+
     //set texture parameters
     /*
 	GL_CHECK_ERROR();
@@ -267,10 +194,9 @@ void Game::initGL()
     /* Linear filtering usually looks best for text */
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
-    Glyph letter = font->getGlyph("Ě");
+    Glyph letter = font->getGlyph("Ř");
 
     //allocate texture
-    //glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, texture_width, texture_height, 0, GL_RGB, GL_UNSIGNED_BYTE, pData );
     glTexImage2D(GL_TEXTURE_2D,
                  0,
                  GL_RGB,
@@ -281,9 +207,6 @@ void Game::initGL()
                  GL_UNSIGNED_BYTE,
                  letter.buffer
                  );
-	
-	//free SOIL image data
-    //SOIL_free_image_data( pData );
 
 	std::cout << "OpenGL Initialization successfull" << std::endl;
     GL_CHECK_ERROR();
@@ -323,14 +246,14 @@ void Game::render()
     //glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
     /* White background */
-    glClearColor(1, 1, 1, 1);
+    glClearColor(1, 1, 0, 1);
     glClear(GL_COLOR_BUFFER_BIT);
 
     /* Enable blending, necessary for our alpha texture */
-    /*
+
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    */
+
     // bind shader
     shader.Use();
         //draw the full screen quad
