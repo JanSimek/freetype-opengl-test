@@ -21,6 +21,7 @@ public:
 			   bool fullscreen = false );
 	void initGL();
 	void render();
+	void render_text( std::u32string text, float x, float y );
 	void update();
 	void handleEvents();
 	void clean();
@@ -29,9 +30,15 @@ public:
 	{
 		return m_bRunning;
 	}
-
-    unsigned short getWidth() { return this->window.width; }
-    unsigned short getHeight() { return this->window.height; }
+	
+	unsigned short getWidth()
+	{
+		return this->window.width;
+	}
+	unsigned short getHeight()
+	{
+		return this->window.height;
+	}
 	
 private:
 	bool m_bRunning;
@@ -50,9 +57,9 @@ private:
 	{
 		unsigned short width;
 		unsigned short height;
-    } window;
-
-    Font* font;
+	} window;
+	
+	Font* font;
 };
 
 

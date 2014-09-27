@@ -53,14 +53,14 @@ void Game::init( unsigned short width, unsigned short height, bool fullscreen )
 	SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
 	SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 24 );
 	
-    m_pWindow = SDL_CreateWindow( "OpenGL + Freetype",
+	m_pWindow = SDL_CreateWindow( "OpenGL + Freetype",
 								  SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 								  width, height,
 								  SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN );
 								  
-    this->window.height = height;
-    this->window.width = width;
-
+	this->window.height = height;
+	this->window.width = width;
+	
 	if( m_pWindow == nullptr )
 	{
 		std::cout << SDL_GetError() << std::endl;
@@ -101,9 +101,9 @@ void Game::init( unsigned short width, unsigned short height, bool fullscreen )
 	std::cout << "Renderer: " << glGetString( GL_RENDERER ) << std::endl;
 	std::cout << "Version: " << glGetString( GL_VERSION ) << std::endl;
 	std::cout << "GLSL: " << glGetString( GL_SHADING_LANGUAGE_VERSION ) << std::endl;
-
-    font = new Font();
-
+	
+	font = new Font();
+	
 	initGL();
 }
 
@@ -114,102 +114,102 @@ void Game::initGL()
 	
 	GL_CHECK_ERROR();
 	
-    //load shader
-    shader.LoadFromFile( GL_VERTEX_SHADER, "shaders/shader.vert" );
-    shader.LoadFromFile( GL_FRAGMENT_SHADER, "shaders/shader.frag" );
+	//load shader
+	shader.LoadFromFile( GL_VERTEX_SHADER, "shaders/shader.vert" );
+	shader.LoadFromFile( GL_FRAGMENT_SHADER, "shaders/shader.frag" );
 	
 	//compile and link shader
 	shader.CreateAndLinkProgram();
-    shader.Use();
-        //add attributes and uniforms
-        shader.AddAttribute("vVertex");
-        shader.AddUniform("textureMap");
-        //pass values of constant uniforms at initialization
-        glUniform1i(shader("textureMap"), 0);
+	shader.Use();
+	//add attributes and uniforms
+	shader.AddAttribute( "vVertex" );
+	shader.AddUniform( "textureMap" );
+	//pass values of constant uniforms at initialization
+	glUniform1i( shader( "textureMap" ), 0 );
 	shader.UnUse();
-
-    GL_CHECK_ERROR();
-	
-	//setup quad geometry
-    //setup quad vertices
-
-    vertices[0] = glm::vec4(-1.0,-1.0, 0,1);
-    vertices[1] = glm::vec4(1.0,1.0, 1,0);
-    vertices[2] = glm::vec4(1.0,-1.0, 1,1);
-    vertices[3] = glm::vec4(-1.0,1.0, 0,0);
-	
-	//fill quad indices array
-    GLushort* id = &indices[0];
-    *id++ = 0;
-    *id++ = 1;
-    *id++ = 2;
-    *id++ = 0;
-    *id++ = 1;
-    *id++ = 3;
 	
 	GL_CHECK_ERROR();
-
+	
+	//setup quad geometry
+	//setup quad vertices
+	
+	vertices[0] = glm::vec4( -1.0, -1.0, 0, 1 );
+	vertices[1] = glm::vec4( 1.0, 1.0, 1, 0 );
+	vertices[2] = glm::vec4( 1.0, -1.0, 1, 1 );
+	vertices[3] = glm::vec4( -1.0, 1.0, 0, 0 );
+	
+	//fill quad indices array
+	GLushort* id = &indices[0];
+	*id++ = 0;
+	*id++ = 1;
+	*id++ = 2;
+	*id++ = 0;
+	*id++ = 1;
+	*id++ = 3;
+	
+	GL_CHECK_ERROR();
+	
 	//setup quad vao and vbo stuff
 	glGenVertexArrays( 1, &vaoID );
 	glGenBuffers( 1, &vboVerticesID );
-    glGenBuffers( 1, &vboIndicesID );
+	glGenBuffers( 1, &vboIndicesID );
 	
 	glBindVertexArray( vaoID );
-
-    glBindBuffer (GL_ARRAY_BUFFER, vboVerticesID);
-    //pass quad vertices to buffer object
-    glBufferData (GL_ARRAY_BUFFER, sizeof(vertices), &vertices[0], GL_DYNAMIC_DRAW);
-    GL_CHECK_ERROR();
-
-    //enable vertex attribute array for position
-    glEnableVertexAttribArray(shader["vVertex"]);
-    glVertexAttribPointer(shader["vVertex"], sizeof(shader["vVertex"]), GL_FLOAT, GL_FALSE,0,0);
-    GL_CHECK_ERROR();
-
-    //pass quad indices to element array buffer
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboIndicesID);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), &indices[0], GL_STATIC_DRAW);
-    GL_CHECK_ERROR();
-
+	
+	glBindBuffer( GL_ARRAY_BUFFER, vboVerticesID );
+	//pass quad vertices to buffer object
+	glBufferData( GL_ARRAY_BUFFER, sizeof( vertices ), &vertices[0], GL_DYNAMIC_DRAW );
+	GL_CHECK_ERROR();
+	
+	//enable vertex attribute array for position
+	glEnableVertexAttribArray( shader["vVertex"] );
+	glVertexAttribPointer( shader["vVertex"], sizeof( shader["vVertex"] ), GL_FLOAT, GL_FALSE, 0, 0 );
+	GL_CHECK_ERROR();
+	
+	//pass quad indices to element array buffer
+	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vboIndicesID );
+	glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( indices ), &indices[0], GL_STATIC_DRAW );
+	GL_CHECK_ERROR();
+	
 	//setup OpenGL texture and bind to texture unit 0
-    glGenTextures( 1, &textureID );
-    glActiveTexture( GL_TEXTURE0 );
+	glGenTextures( 1, &textureID );
+	glActiveTexture( GL_TEXTURE0 );
 	glBindTexture( GL_TEXTURE_2D, textureID );
-
-    //set texture parameters
-    /*
+	
+	//set texture parameters
+	/*
 	GL_CHECK_ERROR();
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 	GL_CHECK_ERROR();
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-    GL_CHECK_ERROR();
-    */
-
-    /* We require 1 byte alignment when uploading texture data */
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-    /* Clamping to edges is important to prevent artifacts when scaling */
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    /* Linear filtering usually looks best for text */
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
-    Glyph letter = font->getGlyph("Ř");
-
-    //allocate texture
-    glTexImage2D(GL_TEXTURE_2D,
-                 0,
-                 GL_RGB,
-                 letter.width,
-                 letter.height,
-                 0,
-                 GL_RED,
-                 GL_UNSIGNED_BYTE,
-                 letter.buffer
-                 );
-
+	GL_CHECK_ERROR();
+	*/
+	
+	/* We require 1 byte alignment when uploading texture data */
+	glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
+	
+	/* Clamping to edges is important to prevent artifacts when scaling */
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+	/* Linear filtering usually looks best for text */
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+	
+	Glyph letter = font->getGlyph( U'Ř' );
+	
+	//allocate texture
+	glTexImage2D( GL_TEXTURE_2D,
+				  0,
+				  GL_RGB,
+				  letter.width,
+				  letter.height,
+				  0,
+				  GL_RED,
+				  GL_UNSIGNED_BYTE,
+				  letter.buffer
+				);
+				
 	std::cout << "OpenGL Initialization successfull" << std::endl;
-    GL_CHECK_ERROR();
+	GL_CHECK_ERROR();
 }
 
 void Game::handleEvents()
@@ -241,30 +241,84 @@ void Game::handleEvents()
 	}
 }
 
+void Game::render_text( std::u32string text, float x, float y )
+{
+	int index = 0;
+	
+	//std::cout << "Original text: " << text << std::endl;
+	//std::cout << "First letter: "  << text.at(0) << text.at(1) << std::endl;
+	
+	for( auto it = text.begin(); it < text.end(); it++, index++ )
+	{
+		// std::cout << index << ": " << text.at(index) << std::endl;
+		
+		Glyph letter = font->getGlyph( *it );
+		
+		//std::cout << "Iterating: " << index << ": " << *it << text.at(index) << std::endl;
+		glTexImage2D( GL_TEXTURE_2D,
+					  0,
+					  GL_RGB,
+					  letter.width,
+					  letter.height,
+					  0,
+					  GL_RED,
+					  GL_UNSIGNED_BYTE,
+					  letter.buffer
+					);
+					
+		GL_CHECK_ERROR();
+		/*
+		  render_text("The Quick Brown Fox Jumps Over The Lazy Dog",
+		              -1 + 8 * sx,   1 - 50 * sy,    sx, sy);
+		*/
+		float sx = 2.0 / this->window.width;
+		float sy = 2.0 / this->window.height;
+		float x2 = x + letter.pen_left * sx;
+		float y2 = -y - letter.pen_top * sy;
+		float w = letter.width * sx;
+		float h = letter.height * sy;
+		
+		GLfloat box[4][4] =
+		{
+			{x2,     -y2    , 0, 0},
+			{x2 + w, -y2    , 1, 0},
+			{x2,     -y2 - h, 0, 1},
+			{x2 + w, -y2 - h, 1, 1},
+		};
+		
+		glBufferData( GL_ARRAY_BUFFER, sizeof box, box, GL_DYNAMIC_DRAW );
+		glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
+		
+		x += ( letter.advancex >> 6 ) * sx;
+		y += ( letter.advancey >> 6 ) * sy;
+	}
+}
+
 void Game::render()
 {
-    //glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-
-    /* White background */
-    glClearColor(1, 1, 0, 1);
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    /* Enable blending, necessary for our alpha texture */
-
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    // bind shader
-    shader.Use();
-        //draw the full screen quad
-        glDrawElements(GL_TRIANGLES, sizeof(indices), GL_UNSIGNED_SHORT, 0);
-    // unbind shader
-    shader.UnUse();
-
-    GL_CHECK_ERROR();
-
-    // swap front and back buffers to show the rendered result
-    SDL_GL_SwapWindow( m_pWindow );
+	//glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+	
+	/* White background */
+	glClearColor( 0, 0, 0, 1 );
+	glClear( GL_COLOR_BUFFER_BIT );
+	
+	/* Enable blending, necessary for our alpha texture */
+	
+	glEnable( GL_BLEND );
+	glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+	
+	// bind shader
+	shader.Use();
+	render_text( U"Příliš žluťoučký kůň úpěl ďábelské ódy.", -0.95f, 0.0f );
+	//draw the full screen quad
+	//glDrawElements(GL_TRIANGLES, sizeof(indices), GL_UNSIGNED_SHORT, 0);
+	// unbind shader
+	shader.UnUse();
+	
+	GL_CHECK_ERROR();
+	
+	// swap front and back buffers to show the rendered result
+	SDL_GL_SwapWindow( m_pWindow );
 }
 
 void Game::update()
@@ -274,22 +328,22 @@ void Game::update()
 
 void Game::clean()
 {
-    //Destroy shader
-    shader.DeleteShaderProgram();
-
-    //Destroy vao and vbo
-    glDeleteBuffers( 1, &vboVerticesID );
-    glDeleteBuffers( 1, &vboIndicesID );
-    glDeleteVertexArrays( 1, &vaoID );
-
-    //Delete textures
-    glDeleteTextures( 1, &textureID );
-
-    SDL_GL_DeleteContext( m_pGlcontext );
-    SDL_DestroyWindow( m_pWindow );
-    SDL_Quit();
-
-    delete font;
-
-    std::cout << "Exitting...\n";
+	//Destroy shader
+	shader.DeleteShaderProgram();
+	
+	//Destroy vao and vbo
+	glDeleteBuffers( 1, &vboVerticesID );
+	glDeleteBuffers( 1, &vboIndicesID );
+	glDeleteVertexArrays( 1, &vaoID );
+	
+	//Delete textures
+	glDeleteTextures( 1, &textureID );
+	
+	SDL_GL_DeleteContext( m_pGlcontext );
+	SDL_DestroyWindow( m_pWindow );
+	SDL_Quit();
+	
+	delete font;
+	
+	std::cout << "Exitting...\n";
 }

@@ -19,12 +19,12 @@ int main( int argc, const char* argv[] )
 		g_game->update();
 		g_game->render();
 	}
-
+	
 	g_game->clean();
-
-    delete g_game;
-
-    /*
+	
+	delete g_game;
+	
+	/*
 	unsigned int n = 720;
 	
 	std::cout << "Next highest power of two from " << n;
@@ -39,7 +39,7 @@ int main( int argc, const char* argv[] )
 	// next highest power of 2.
 	
 	std::cout << " is " << n << std::endl;
-    */
+	*/
 	return 0;
 }
 

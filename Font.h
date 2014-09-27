@@ -11,32 +11,34 @@
 
 struct Glyph
 {
-    int width;
-    int height;
-    int pen_left;
-    int pen_top;
-    unsigned char* buffer;
+	int width;
+	int height;
+	int pen_left;
+	int pen_top;
+	int advancex;
+	int advancey;
+	unsigned char* buffer;
 };
 
 class Font
 {
 public:
 	Font();
-    ~Font();
-
-    void show_image( void );
-    void draw_bitmap( FT_Bitmap*  bitmap,
-                 FT_Int      x,
-                 FT_Int      y );
-
-    Glyph getGlyph(const char* letter);
-
+	~Font();
+	
+	void show_image( void );
+	void draw_bitmap( FT_Bitmap*  bitmap,
+					  FT_Int      x,
+					  FT_Int      y );
+					  
+	Glyph getGlyph( char32_t );
+	
 private:
 	FT_Library  library;   /* handle to library     */
 	FT_Face     face;      /* handle to face object */
-
-    /* origin is the upper left corner */
-    unsigned char image[HEIGHT][WIDTH];
+	
+	/* origin is the upper left corner */
+	unsigned char image[HEIGHT][WIDTH];
 };
 
 #endif // FONT_H

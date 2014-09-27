@@ -19,7 +19,7 @@ pkg_check_modules(FREETYPE REQUIRED freetype2)
 list(APPEND LIBRARIES ${FREETYPE_LIBRARIES})
 include_directories(SYSTEM ${FREETYPE_INCLUDE_DIRS})
 
-set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-Wno-c++11-extensions")
+#set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-Wno-c++11-extensions")
 
 set(SOURCES
     Font.cpp
